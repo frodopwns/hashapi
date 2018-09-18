@@ -1,4 +1,4 @@
-package main
+package hashapi
 
 import (
 	"io/ioutil"
@@ -229,5 +229,77 @@ func TestHashMap(t *testing.T) {
 				expected,
 			)
 		}
+	}
+}
+
+func TestNewHashApi(t *testing.T) {
+	h := NewHashApi("8080", "", "", "")
+	if h.Env == nil {
+		t.Errorf("HashApi must have an Env object set")
+	}
+
+	if h.Env.HashMap == nil {
+		t.Errorf("HashApi must have a HashMap")
+	}
+	if h.Env.Stats == nil {
+		t.Errorf("HashApi must have a Stats object")
+	}
+	if h.Env.wg == nil {
+		t.Errorf("HashApi must have a WaitGroup")
+	}
+	if h.Env.Terminating != false {
+		t.Errorf("HashApi should not start in terminating state")
+	}
+}
+
+func TestRoutes(t *testing.T) {
+	h := NewHashApi(
+		"8080",
+		"localhost",
+		"",
+		"",
+	).Routes([]Route{
+		{
+			"/test", func(env *Env, w http.ResponseWriter, req *http.Request) error {
+				return nil
+			},
+		},
+	})
+	if h == nil {
+		t.Errorf("HashApi should not be nil")
+	}
+}
+
+func TestIsSSL(t *testing.T) {
+	h := NewHashApi(
+		"8080",
+		"localhost",
+		"",
+		"",
+	)
+	if h.IsSSL() == true {
+		t.Errorf("HashApi should not be using SSL with no cert")
+	}
+
+	h = NewHashApi(
+		"8080",
+		"localhost",
+		"server.crt",
+		"server.key",
+	)
+	if h.IsSSL() != true {
+		t.Errorf("HashApi should be using SSL")
+	}
+}
+
+func TestNewServer(t *testing.T) {
+	s := NewServer(
+		"8080",
+		"localhost",
+		"",
+		"",
+	)
+	if s == nil {
+		t.Errorf("HashApi should not be nil")
 	}
 }

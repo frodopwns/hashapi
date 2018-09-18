@@ -4,7 +4,7 @@ build:
 	go build
 
 test:
-	GOCACHE=off go test -v
+	GOCACHE=off go test -v pkg/hashapi/*.go
 
 run:
 	./hashapi
