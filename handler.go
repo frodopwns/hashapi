@@ -28,6 +28,7 @@ type Handler struct {
 
 // ServeHTTP allows our Handler type to satisfy http.Handler.
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// log request data
 	defer func() {
 		log.Printf("%s %s", r.Method, r.URL.Path)
 	}()
