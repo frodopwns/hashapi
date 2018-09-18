@@ -73,3 +73,33 @@ func (s *Stats) JSON() string {
 		s.requestTime/float64(s.requests),
 	)
 }
+
+// Env wraps the shared items each handler may need
+type Env struct {
+	HashMap     *HashMap
+	Stats       *Stats
+	Terminating bool
+	wg          *sync.WaitGroup
+}
+
+// Error represents a handler error. It makes it easier and cleaner to return errors from handlers.
+type Error interface {
+	error
+	Status() int
+}
+
+// StatusError represents an error with an associated HTTP status code.
+type StatusError struct {
+	Code int
+	Err  error
+}
+
+// Allows StatusError to satisfy the error interface.
+func (s StatusError) Error() string {
+	return fmt.Sprintf("%d: %s", s.Code, s.Err.Error())
+}
+
+// Returns our HTTP status code.
+func (s StatusError) Status() int {
+	return s.Code
+}

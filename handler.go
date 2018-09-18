@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 )
@@ -21,36 +20,6 @@ const (
 	HashIdNotFound      = "no hash with that id was found"
 )
 
-// Env wraps the shared items each handler may need
-type Env struct {
-	HashMap     *HashMap
-	Stats       *Stats
-	Terminating bool
-	wg          *sync.WaitGroup
-}
-
-// Error represents a handler error. It makes it easier and cleaner to return errors from handlers.
-type Error interface {
-	error
-	Status() int
-}
-
-// StatusError represents an error with an associated HTTP status code.
-type StatusError struct {
-	Code int
-	Err  error
-}
-
-// Allows StatusError to satisfy the error interface.
-func (s StatusError) Error() string {
-	return fmt.Sprintf("%d: %s", s.Code, s.Err.Error())
-}
-
-// Returns our HTTP status code.
-func (s StatusError) Status() int {
-	return s.Code
-}
-
 // wrap the usual go handler so we can add variables
 type Handler struct {
 	env *Env
@@ -59,6 +28,9 @@ type Handler struct {
 
 // ServeHTTP allows our Handler type to satisfy http.Handler.
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		log.Printf("%s %s", r.Method, r.URL.Path)
+	}()
 	// start tracking time for the request
 	start := time.Now()
 
@@ -94,7 +66,6 @@ func hashHandler(env *Env, w http.ResponseWriter, req *http.Request) error {
 
 	// handle POSTS here
 	if req.Method == "POST" {
-
 		// get password value from post
 		pw := req.PostFormValue("password")
 		if pw == "" {

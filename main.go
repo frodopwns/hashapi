@@ -49,6 +49,7 @@ func main() {
 		os.Exit(0)
 	}()
 
+	// determine if this should be ssl or not and then run the server
 	info := "Running server at %s://localhost:%s\n"
 	var err error
 	if *certPtr == "" || *keyPtr == "" {
