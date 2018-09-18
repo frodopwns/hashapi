@@ -14,6 +14,20 @@ Usage of ./hashapi:
     	port to bind the api server to (default "8080")
 ```
 
+## Endpoints
+
+    POST /hash with payload=`password=some_password`
+      - returns a hash id
+
+    GET /hash/id
+      - will return the hashed password if 5 seconds since creation have elapsed
+
+    GET /stats
+      - returns a JSON response with total hashes posted and the average time to handle those posts
+
+    GET /shutdown
+      - graceful shutdown of service
+
 ## Test
 
 ```
