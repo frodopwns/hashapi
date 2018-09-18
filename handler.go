@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -19,6 +20,14 @@ const (
 	NoPayloadPresentErr = "a form field 'password' must be included withthe POST"
 	HashIdNotFound      = "no hash with that id was found"
 )
+
+// Env wraps the shared items each handler may need
+type Env struct {
+	HashMap     *HashMap
+	Stats       *Stats
+	Terminating bool
+	wg          *sync.WaitGroup
+}
 
 // Error represents a handler error. It makes it easier and cleaner to return errors from handlers.
 type Error interface {
@@ -95,10 +104,12 @@ func hashHandler(env *Env, w http.ResponseWriter, req *http.Request) error {
 		// reserve hash index key
 		id := env.HashMap.Save("pending")
 
+		env.wg.Add(1)
 		// spin off a go routine to hash the password in 5 seconds
 		go func(id int, pw string) {
 			time.Sleep(5 * time.Second)
 			env.HashMap.Update(id, HashMe(pw))
+			env.wg.Done()
 		}(id, pw)
 
 		fmt.Fprintln(w, id)

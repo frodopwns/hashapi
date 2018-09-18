@@ -5,13 +5,6 @@ import (
 	"sync"
 )
 
-// Env wraps the shared items each handler may need
-type Env struct {
-	HashMap     *HashMap
-	Stats       *Stats
-	Terminating bool
-}
-
 // HashMap is a threadsafe map implementation for storing hashes
 type HashMap struct {
 	sync.RWMutex
