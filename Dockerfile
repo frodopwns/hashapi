@@ -1,6 +1,5 @@
 # STEP 1 build executable binary
 FROM golang:alpine as builder
-# Install SSL ca certificates
 RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
 COPY . $GOPATH/src/frodopwns/hashapi/
 WORKDIR $GOPATH/src/frodopwns/hashapi/
