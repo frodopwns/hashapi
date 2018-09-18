@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -36,6 +37,7 @@ func TestGetHashHandler(t *testing.T) {
 		env := &Env{
 			HashMap: NewHashMap(),
 			Stats:   NewStats(),
+			wg:      &sync.WaitGroup{},
 		}
 		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 		rr := httptest.NewRecorder()
@@ -86,6 +88,7 @@ func TestPostHashHandler(t *testing.T) {
 		env := &Env{
 			HashMap: NewHashMap(),
 			Stats:   NewStats(),
+			wg:      &sync.WaitGroup{},
 		}
 		handler := http.Handler(Handler{env, hashHandler})
 		ts := httptest.NewServer(handler)
